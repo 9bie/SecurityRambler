@@ -37,5 +37,5 @@ def _exploit(target):return True
 
 # 参考
 
-  - [REC任意代码执行漏洞大全](other/RCE漏洞执行大全.pdf)
+  - [REC任意代码执行漏洞大全](Other/RCE漏洞执行大全.pdf)
   - 待续
