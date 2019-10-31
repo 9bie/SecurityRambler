@@ -38,4 +38,4 @@ def _exploit(target):return True
 # 参考
 
   - [REC任意代码执行漏洞大全](Other/RCE漏洞执行大全.pdf)
-  - 待续
+  - [WTF_SCAN](https://github.com/dyboy2017/WTF_Scan)
