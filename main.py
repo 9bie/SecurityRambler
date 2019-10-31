@@ -2,6 +2,6 @@
 import Explorer
 
 b = Explorer.Exploit()
-a = Explorer.Spider(b)
+a = Explorer.Spider(b.add)
 a.add("https://www.hao123.com")
 a.start()

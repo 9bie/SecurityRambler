@@ -5,7 +5,9 @@ import queue
 from .database import write_spider, select_spider
 from urllib.parse import urlparse
 import re
-
+import importlib
+import glob
+from pathlib import Path
 
 class Parser:
     def __init__(self, control, exploit,target):
@@ -35,7 +37,7 @@ class Parser:
         clean = []
         for i in url:
             i = i[6:len(i) - 1]
-            c = re.findall(r'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', i)
+            c = re.findall(r'http[s]?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', i)
             if len(c) != 0:
                 if Search_Engine_Mode:
                     clean.append(i)
@@ -44,19 +46,35 @@ class Parser:
         clean = list(set(clean))
         for z in clean:
             self.control(z)
+            self.exploit(z)
         write_spider(True, self.url.netloc, self.target, title)
 
 
 class Exploit:
     def __init__(self):
-        self.list = queue.Queue(500)
+        self.list = queue.Queue(5000)
+        self.plugin_center = {}
+        for i in glob.glob("../Exploit/*.py"):
+            try:
+                obj = importlib.import_module(f"..Exploit.{Path(i).stem}")
+                register, plugins = obj.initialization()
+                self.plugin_center[register] = plugins
+            except:
+                print()
 
     def add(self, target):
         self.list.put(target, block=True)
 
     def start(self):
         while 1:
-            pass
+            target = self.list.get(block=True)
+            for i in self.plugin_center:
+                result = self.plugin_center[i]["callback"](target)
+                if result:
+                    # Write on Db
+                    break
+            # Write False in Db
+
 
 
 class Spider:
@@ -73,7 +91,7 @@ class Spider:
         self.executor = ThreadPoolExecutor(max_workers=(MAX_THREAD if not IS_MYSQL else 1))
         while 1:
             target = self.list.get(block=True)
-            parser = Parser(self.add, target, self.callback)
+            parser = Parser(self.add, self.callback, target)
             # result =
             self.executor.submit(parser.parser())
             # wait([result], return_when=FIRST_COMPLETED)
