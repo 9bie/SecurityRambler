@@ -4,7 +4,7 @@ from pathlib import Path
 import queue
 from config import *
 from .database import write_exploit
-
+import requests
 
 class Exploit:
 
@@ -25,6 +25,7 @@ class Exploit:
     def start(self):
         while 1:
             target = self.list.get(block=True)
+            response = requests.get(target, headers={})
             for i in self.plugin_center:
                 name, result = self.plugin_center[i]["callback"](target)
                 if result:
