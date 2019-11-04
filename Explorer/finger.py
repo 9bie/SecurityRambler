@@ -1,6 +1,15 @@
 import requests
 import threading
 import re
+import requests
+import hashlib, sys
+import gevent
+from gevent.queue import Queue
+from gevent import monkey
+import time
+
+
+
 
 
 class WhatCms:
@@ -123,3 +132,103 @@ class WhatCms:
         while True:
             if self.is_finish:
                 return self.info
+
+
+monkey.patch_all()
+
+
+class gwhatweb(object):
+    def __init__(self, url, webdata):
+        self.tasks = Queue()
+        self.url = url.rstrip("/")
+        self.cmsdict = {}
+        self.cmsname = None
+        for i in webdata:
+            self.tasks.put(i)
+
+        print("webdata total:%d" % len(webdata))
+
+    def _GetMd5(self, body):
+        m2 = hashlib.md5()
+        m2.update(body)
+        return m2.hexdigest()
+
+    def _clearQueue(self):
+        while not self.tasks.empty():
+            self.tasks.get()
+
+    def _worker(self):
+        data = self.tasks.get()
+        test_url = "{0}{1}".format(self.url, data["url"])
+        req = None
+        try:
+            print("[!]spider website {0}".format(test_url))
+            req = requests.get(test_url, timeout=10)
+            #
+            # rtext = req.text
+            # if rtext is None:
+            #     return
+        except:
+            rtext = ''
+
+        if not req:
+            return False
+
+        result = checkcms(req, data)
+
+        if result:
+
+            if result > 100:
+                # logger.info('web is  {0} finger: {1}'.format(data['name'], data['url']))
+                return data['name']
+
+            if data['name'] not in self.cmsdict:
+                # logger.info('web look like {0}'.format(data['name']))
+                self.cmsdict[data['name']] = data['weight']
+                # logger.info('cms weight:{}'.format(self.cmsdict[data['name']]))
+            else:
+                self.cmsdict[data['name']] += data['weight']
+                # logger.info('cms weight:{}'.format(self.cmsdict[data['name']]))
+                if self.cmsdict[data['name']] > 100:
+                    # logger.info('web is  {0} finger: {1}'.format(data['name'], data['url']))
+
+                    return data['name']
+        return False
+
+    def _boss(self):
+        while not self.tasks.empty():
+            flag = self._worker()
+            if flag:
+                self.cmsname = flag
+                self._clearQueue()
+
+    def whatweb(self, maxsize=5):
+        allr = [gevent.spawn(self._boss) for i in range(maxsize)]
+        gevent.joinall(allr)
+        return self.cmsname
+
+
+def checkcms(req_obj, rule):
+    '''
+    {"ruletype": "code", "rule": 200, "weight":75}
+    :return:
+    '''
+    # if self.rule['d']
+    method = rule['method']
+    weight = 0
+
+    if method == 're':
+        regu_cont = re.compile(rule['value'], re.I)
+        res = regu_cont.match(req_obj.text)
+        if res:
+            weight = rule['weight']
+    elif method == 'md5':
+        md5 = _GetMd5(req_obj.text)
+        if md5 == rule['value']:
+            weight = rule['weight']
+    elif method == 'code':
+        code = req_obj.status_code
+        if code == rule['value']:
+            weight = rule['weight']
+
+    return weight

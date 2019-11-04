@@ -18,7 +18,7 @@
 
   - peewee （我才不想自己写sql）
   - requests （优雅的HTTP轮子
-  
+  - gevent
 
 ## TODO：瞎鸡儿打啥EXP?
 
@@ -39,3 +39,4 @@ def _exploit(target):return True
 
   - [REC任意代码执行漏洞大全](Other/RCE漏洞执行大全.pdf)
   - [WTF_SCAN](https://github.com/dyboy2017/WTF_Scan)
+  - [AutoFuck](https://github.com/harry1080/AutoFuck)

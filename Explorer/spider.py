@@ -5,12 +5,10 @@ import queue
 from .database import write_spider, select_spider
 from urllib.parse import urlparse
 import re
-import importlib
-import glob
-from pathlib import Path
+
 
 class Parser:
-    def __init__(self, control, exploit,target):
+    def __init__(self, control, exploit, target):
         self.target = target
         self.control = control
         self.exploit = exploit
@@ -21,7 +19,8 @@ class Parser:
         if select_spider(self.target):
             return
         response = requests.get(self.target, headers={
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) \
+            AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36',
             'Referer': self.url.netloc,
             'robot': "SecurityExplorer",
         })
@@ -50,30 +49,6 @@ class Parser:
         write_spider(True, self.url.netloc, self.target, title)
 
 
-class Exploit:
-    def __init__(self):
-        self.list = queue.Queue(5000)
-        self.plugin_center = {}
-        for i in glob.glob("../Exploit/*.py"):
-            try:
-                obj = importlib.import_module(f"..Exploit.{Path(i).stem}")
-                register, plugins = obj.initialization()
-                self.plugin_center[register] = plugins
-            except:
-                print()
-
-    def add(self, target):
-        self.list.put(target, block=True)
-
-    def start(self):
-        while 1:
-            target = self.list.get(block=True)
-            for i in self.plugin_center:
-                result = self.plugin_center[i]["callback"](target)
-                if result:
-                    # Write on Db
-                    break
-            # Write False in Db
 
 
 
@@ -88,7 +63,7 @@ class Spider:
         self.list.put(target)
 
     def start(self):
-        self.executor = ThreadPoolExecutor(max_workers=(MAX_THREAD if not IS_MYSQL else 1))
+        self.executor = ThreadPoolExecutor(max_workers=(MAX_THREAD if not IS_MYSQL or THREAD is True else 1))
         while 1:
             target = self.list.get(block=True)
             parser = Parser(self.add, self.callback, target)

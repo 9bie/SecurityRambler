@@ -12,6 +12,7 @@ MYSQL_PASSWD = 'bakabie'
 Customize_UserAgent = ''
 THREAD = True
 
+
 MAX_THREAD = 10
 '''
 MAX_THREAD:
@@ -23,10 +24,17 @@ Full_Spider2OtherLink = False
 Full_Spider2OtherLink:
   为True这项将会抓取所有页面，否则只会抓取首页下的连接
 '''
+
+Just_One = True
+'''
+Just_One:
+    发现漏洞就停止，节省时间，默认开启
+'''
+
 Search_Engine_Mode = True
 '''
 SearchEngineMode：
-    是否保存全部子页面网页，这会导致数据库变得极大。如果你不是想做一个搜索引擎，不推荐这样做
+    是否保存爬取子页面网页。
 '''
 
 # Exploit
@@ -35,8 +43,9 @@ Used = []
 Used:
   为空则默认引用Exploit下全部，否则只引用List内的文件
 '''
-Test_All_Page = False
+
+CMS_Engine = False
 '''
-Test_All_Page:
-    如果Search_Engine_Mode为True，将会攻击所有Search_Engine_Mode模式下爬取的页面
+CMS_Engine:
+    CMS检测引擎，如果你的EXP库不是特别的多，那么不推荐打开这个
 '''

@@ -24,8 +24,6 @@ class BaseModel(Model):
 
 class Exploit(BaseModel):
     id = PrimaryKeyField()
-    status = BooleanField(default=False)
-    domain = TextField()
     target = TextField()
     payload = TextField()
     update_time = DateTimeField(default=datetime.now)
@@ -62,10 +60,10 @@ def select_exploit(target: str):
 
 
 def write_spider(status: bool, domain: str, target: str, title: str):
-    print("Write on Db\n\tDomain: %s\n\tUrl: %s\n\tTitle: %s" % (domain, target, title))
+    # print("Write on Db\n\tDomain: %s\n\tUrl: %s\n\tTitle: %s" % (domain, target, title))
     Spider.create(status=status, domain=domain, target=target, title=title)
 
 
-def write_exploit_result(status: bool, target: str, cve: str):
-    if status:
-        pass
+def write_exploit(target: str, cve: str):
+    print("Exploit Successful:\n\tTarget:%s\n\tCVE:%s"%(target,cve))
+    Exploit.create(target=target,payload=cve)
