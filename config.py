@@ -38,6 +38,12 @@ SearchEngineMode：
 '''
 
 # Exploit
+MAX_THREAD_EXPLOIT = 10
+'''
+MAX_THREAD_EXPLOIT:
+    攻击负载的并发数量
+'''
+
 Used = []
 '''
 Used:

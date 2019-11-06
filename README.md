@@ -24,6 +24,10 @@
 
 也许在后续版本会完善功能。
 
+为了控制爬虫速度，请尽量选择近两年内，高危，无特征的exploit。
+
+年代久远的漏洞是*没有什么意义的*，成本与回报不成正比，除非你能很确定的*该漏洞广泛存在并且未被修复*
+
 ## 使用
 
 ### 库
@@ -45,6 +49,29 @@
 鸭子类型 嘎嘎嘎。只要符合调用规定就能调用
 ```python
 def _exploit(target):return True 
+```
+
+### 插件规则
+以下为 `Exploit/CVE-XXXX-XXX.py.example`节选
+```python
+def check(url):
+    '''
+    检测函数，url必要的
+    :param url:
+    :return:
+    '''
+    return False
+
+
+def initialization():
+    '''
+    必要函数，作为插件初始化用
+    :return: 返回漏洞名称和插件调用信息
+    '''
+    return "TestFunction", {
+        "callback": check,  # 必要指向参数为url的检测函数
+    }
+
 ```
 
 # 参考
